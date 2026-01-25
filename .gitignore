@@ -4,3 +4,5 @@ out/
 .DS_Store
 .netrwhist
 undo/
+.cache/
+compile_commands.json
