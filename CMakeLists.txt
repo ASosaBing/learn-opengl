@@ -48,4 +48,12 @@ target_include_directories(opengl PRIVATE include)
 target_link_libraries(opengl PRIVATE glfw OpenGL::GL)
 
 
+set(RES_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/res")
+set(RES_DEST "${CMAKE_CURRENT_BINARY_DIR}/res")
 
+add_custom_target(update_res ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RES_SOURCE} ${RES_DEST}
+    COMMENT "Syncing resources to build directory..."
+)
+
+add_dependencies(opengl update_res)
