@@ -29,7 +29,7 @@ FetchContent_MakeAvailable(glfw)
 
 #finding OpenGL package
 
-add_executable(opengl src/main.cpp src/glad.c)
+add_executable(opengl src/main.cpp src/glad.c src/renderer.cpp src/vertexbuffer.cpp src/indexbuffer.cpp)
 
 set_target_properties(opengl PROPERTIES 
     CXX_STANDARD 20 

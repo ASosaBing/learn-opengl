@@ -1,43 +1,11 @@
+#include <project/renderer.hpp>
+#include <project/indexbuffer.hpp>
+#include <project/vertexbuffer.hpp>
 #include <alloca.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
-
-
-#if defined(_WIN32) | defined(_WIN64)
-  #define ASSERT(x) if(!(x)) __debug_break(); 
-#endif
-#if(defined(__APPLE__) || defined(__MACH__) || defined(__linux__))
-  #define ASSERT(x) if(!(x)) __builtin_trap();
-#endif
-
-
-#define GLCall(x) GLClearError();\
-  x;\
-  ASSERT(GLLogCall(#x, __FILE__, __LINE__));
-
-
-
-
-
-
-static void GLClearError(){
-    while(glGetError() != GL_NO_ERROR);
-}
-
-static bool GLLogCall(const char* function, const char* file, int line){
-  while(GLenum error = glGetError()){
-    std::cout << "[OpenGL Error] (" << std::hex << error << std::dec << ") "
-              << function << " " << file << ": " << line << std::endl;
-    return false;
-  }
-  return true;
-}
-
-
 
 
 struct ShaderProgramSource {
@@ -139,7 +107,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required for macOS
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
+    glfwSwapInterval(1);
 
 
   
@@ -160,7 +128,7 @@ int main(void)
    
     GLCall(glClear(GL_COLOR_BUFFER_BIT)); 
 
-
+{
     float vertices[] {
   //triangle 1 
       -0.5f, -0.5f,
@@ -171,7 +139,7 @@ int main(void)
     };
 
 
-    int indices[]{
+    unsigned int indices[]{
       0, 1, 2,
       2, 3, 0
     };
@@ -182,17 +150,15 @@ int main(void)
 
 
 //puts things on the GPU, but doesnt tell the gpu how to do anything
-    unsigned int buffer;
-    GLCall(glGenBuffers(1, &buffer));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), vertices, GL_STATIC_DRAW)); 
+  
+    VertexBuffer vb{vertices, 4 * 2 * sizeof(float)};
+
+
+
     GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
     GLCall(glEnableVertexAttribArray(0));
 
-    unsigned int IBO;
-    GLCall(glGenBuffers(1, &IBO));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO));
-    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
+    IndexBuffer ib {indices, 6};
 
 //after this we write some shaders
  
@@ -201,15 +167,19 @@ int main(void)
     GLCall(glUseProgram(shader));
 
 
-
+    GLCall(int location = glGetUniformLocation(shader, "u_Color"));
+    ASSERT(location != -1);
+       float t = 0.01;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        t += 0.01;
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT)); 
+         
+        GLCall(glUniform4f(location, std::pow(std::sin(t), 2), std::pow(std::cos(t + 0.5), 2), 0.8f, 1.0f));
 
-    
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 
@@ -221,6 +191,7 @@ int main(void)
 
 
     GLCall(glDeleteProgram(shader));
+}
     glfwTerminate();
     return 0;
 }
