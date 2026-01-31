@@ -1,5 +1,5 @@
 #ifndef IDXBUFF_HPP
-#define IXDBUFF_HPP
+#define IDXBUFF_HPP
 class IndexBuffer {
 public:
   IndexBuffer(const unsigned int *data, unsigned int count);
