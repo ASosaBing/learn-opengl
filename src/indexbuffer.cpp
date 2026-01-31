@@ -1,7 +1,7 @@
 #include <project/indexbuffer.hpp>
 #include <project/renderer.hpp>
 
-IndexBuffer::IndexBuffer(const unsigned int *data, unsigned int count) {
+IndexBuffer::IndexBuffer(const unsigned int *data, unsigned int count) : m_Count{count} {
 
   ASSERT(sizeof(unsigned int) == sizeof(GLuint));
 

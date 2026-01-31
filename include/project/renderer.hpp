@@ -2,6 +2,10 @@
 #define RENDR_HPP
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <project/indexbuffer.hpp>
+#include <project/shader.hpp>
+#include <project/vertexarray.hpp>
+
 
 #if defined(_WIN32) | defined(_WIN64)
 #define ASSERT(x)                                                              \
@@ -21,5 +25,16 @@
 
 void GLClearError();
 bool GLLogCall(const char *function, const char *file, int line);
+
+
+class Renderer {
+public:
+  void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+  void Clear() const;
+
+
+
+};
+
 
 #endif

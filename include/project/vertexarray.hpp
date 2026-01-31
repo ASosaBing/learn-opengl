@@ -1,8 +1,10 @@
 #ifndef VRTX_ARRAY
 #define VRTX_ARRAY
-#include <project/vertexbufferlayout.hpp>
 #include <project/vertexbuffer.hpp>
-#include <project/renderer.hpp>
+
+
+class VertexBufferLayout;
+
 class VertexArray
 {
 private:

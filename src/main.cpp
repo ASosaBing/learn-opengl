@@ -1,6 +1,7 @@
 #include <project/renderer.hpp>
 #include <project/indexbuffer.hpp>
 #include <project/vertexbuffer.hpp>
+#include <project/vertexbufferlayout.hpp>
 #include <project/shader.hpp>
 #include <project/vertexarray.hpp>
 
@@ -28,7 +29,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required for macOS
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
 
   
@@ -46,9 +47,7 @@ int main(void)
       std::cout << "Failed to initialize GLAD" << std::endl;
       return -1;
     }
-   
-    GLCall(glClear(GL_COLOR_BUFFER_BIT)); 
-
+  
 {
     float vertices[] {
   //triangle 1 
@@ -63,43 +62,29 @@ int main(void)
       2, 3, 0
     };
 
-
-
-
-//puts things on the GPU, but doesnt tell the gpu how to do anything
-    {
-      VertexBuffer vb{vertices, 4 * 2 * sizeof(float)};
-    }
-
-
     VertexArray va{};
     VertexBuffer vb{vertices, 4 * 2 * sizeof(float)};
     IndexBuffer ib {indices, 6};
-
+    Shader shader{"./res/shaders/basic.shader"};
     VertexBufferLayout layout;
+    Renderer renderer;
+
 
     layout.Push<float>(2);
-    va.AddBuffer(vb, layout);
-    
-//after this we write some shaders
-    Shader shader{"./res/shaders/basic.shader"};
-    shader.Bind();
-    shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-
+    va.AddBuffer(vb, layout); 
     float t = 0.01;
-    va.Bind(); 
-    ib.Bind();
+
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        t += 0.01;
+        t += 0.001;
         /* Render here */
-        GLCall(glClear(GL_COLOR_BUFFER_BIT)); 
-        
+        renderer.Clear();
+        shader.Bind(); 
         shader.SetUniform4f("u_Color",  std::pow(std::sin(t), 2), std::pow(std::cos(t + 0.5), 2), 0.8f, 1.0f);
+        renderer.Draw(va, ib, shader);
 
-
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 
         glfwSwapBuffers(window);
@@ -107,10 +92,8 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
-    std::cout << "exited loop" << std::endl;
 
 }
-    std::cout << "terminating glfw" << std::endl;
     glfwTerminate();
     return 0;
 }
