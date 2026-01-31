@@ -7,7 +7,7 @@
 
 #include <alloca.h>
 #include <iostream>
-
+#include <cmath>
 
 
 
@@ -67,9 +67,12 @@ int main(void)
 
 
 //puts things on the GPU, but doesnt tell the gpu how to do anything
-  
-    VertexArray va;
+    {
+      VertexBuffer vb{vertices, 4 * 2 * sizeof(float)};
+    }
 
+
+    VertexArray va{};
     VertexBuffer vb{vertices, 4 * 2 * sizeof(float)};
     IndexBuffer ib {indices, 6};
 
@@ -104,9 +107,10 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
-
+    std::cout << "exited loop" << std::endl;
 
 }
+    std::cout << "terminating glfw" << std::endl;
     glfwTerminate();
     return 0;
 }
