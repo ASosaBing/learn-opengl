@@ -4,7 +4,7 @@
 #include <project/vertexbufferlayout.hpp>
 #include <project/shader.hpp>
 #include <project/vertexarray.hpp>
-
+#include <project/texture.hpp>
 
 #include <alloca.h>
 #include <iostream>
@@ -51,11 +51,11 @@ int main(void)
 {
     float vertices[] {
   //triangle 1 
-      -0.5f, -0.5f,
-       0.5f, -0.5f,
+      -0.5f, -0.5f, 0.0f, 0.0f,
+       0.5f, -0.5f, 1.0f, 0.0f,
   //triangle 2
-       0.5f,  0.5f,
-      -0.5f,  0.5f,
+       0.5f,  0.5f, 1.0f, 1.0f,
+      -0.5f,  0.5f, 0.0f, 1.0f
     };
     unsigned int indices[]{
       0, 1, 2,
@@ -63,14 +63,24 @@ int main(void)
     };
 
     VertexArray va{};
-    VertexBuffer vb{vertices, 4 * 2 * sizeof(float)};
+    VertexBuffer vb{vertices, 4 * 4 * sizeof(float)};
     IndexBuffer ib {indices, 6};
     Shader shader{"./res/shaders/basic.shader"};
     VertexBufferLayout layout;
     Renderer renderer;
+    Texture texture{"./res/textures/flag.png"};
 
+
+
+
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    shader.Bind();
+    texture.Bind(0);
+    shader.SetUniform1i("u_Texture", 0);
 
     layout.Push<float>(2);
+    layout.Push<float>(2);
+
     va.AddBuffer(vb, layout); 
     float t = 0.01;
 
@@ -78,11 +88,10 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        t += 0.001;
+        t += 0.01;
         /* Render here */
         renderer.Clear();
-        shader.Bind(); 
-        shader.SetUniform4f("u_Color",  std::pow(std::sin(t), 2), std::pow(std::cos(t + 0.5), 2), 0.8f, 1.0f);
+        //shader.SetUniform4f("u_Color",  std::pow(std::sin(t), 2), std::pow(std::cos(t + 0.5), 2), 0.8f, 1.0f);
         renderer.Draw(va, ib, shader);
 
 

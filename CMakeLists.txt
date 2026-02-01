@@ -30,7 +30,7 @@ FetchContent_MakeAvailable(glfw)
 #finding OpenGL package
 
 add_executable(opengl src/shader.cpp src/main.cpp src/glad.c src/renderer.cpp src/vertexbuffer.cpp src/indexbuffer.cpp 
-                      src/vertexarray.cpp)
+                      src/vertexarray.cpp src/stb_image.cpp src/texture.cpp)
 
 
 set_target_properties(opengl PROPERTIES 
