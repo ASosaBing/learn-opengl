@@ -1,6 +1,9 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/vector_float4.hpp"
+#include "glm/ext/vector_float3.hpp"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 #include <project/renderer.hpp>
 #include <project/indexbuffer.hpp>
 #include <project/vertexbuffer.hpp>
@@ -37,7 +40,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required for macOS
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
 
   
@@ -79,10 +82,9 @@ int main(void)
     Texture texture{"./res/textures/flag.png"};
     glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
     glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100,0,0));
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
 
 
-    glm::mat4 mvp = proj * view * model;
+
     GLCall(glEnable(GL_BLEND));
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     
@@ -90,7 +92,6 @@ int main(void)
     shader.Bind();
     texture.Bind(0);
     shader.SetUniform1i("u_Texture", 0);
-    shader.SetUniformMat4f("u_MVP", mvp);
 
     layout.Push<float>(2);
     layout.Push<float>(2);
@@ -99,16 +100,48 @@ int main(void)
     float t = 0.01;
 
 
+    float f = 0.0f;
+
+
+    glm::vec3 translation {0,0,0};
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+    ImGui::StyleColorsDark();
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         t += 0.01;
         /* Render here */
+          
+
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 mvp = proj * view * model;
+
+
+
         renderer.Clear();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+
+
         //shader.SetUniform4f("u_Color",  std::pow(std::sin(t), 2), std::pow(std::cos(t + 0.5), 2), 0.8f, 1.0f);
         renderer.Draw(va, ib, shader);
 
+        ImGui::Begin("Matrix Transforms");
+          ImGui::SliderFloat3("translation", &translation.x, 0.0f, 960.0f);  
+          shader.SetUniformMat4f("u_MVP", mvp);
+        ImGui::End();
 
+
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
 
@@ -117,6 +150,10 @@ int main(void)
     }
 
 }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
