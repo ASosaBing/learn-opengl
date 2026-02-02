@@ -27,6 +27,15 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(glfw)
 
+
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 	0af55ccecd98d4e5a8d1fad7de25ba429d60e863 #refs/tags/1.0.1
+)
+FetchContent_MakeAvailable(glm)
+
+
 #finding OpenGL package
 
 add_executable(opengl src/shader.cpp src/main.cpp src/glad.c src/renderer.cpp src/vertexbuffer.cpp src/indexbuffer.cpp 
@@ -47,7 +56,7 @@ set_target_properties(opengl PROPERTIES
 target_include_directories(opengl PRIVATE include)
 
 #working on this
-target_link_libraries(opengl PRIVATE glfw OpenGL::GL)
+target_link_libraries(opengl PRIVATE glfw OpenGL::GL glm)
 
 #adding other directories that arent necessary to  
 

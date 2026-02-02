@@ -1,3 +1,6 @@
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/vector_float4.hpp"
 #include <project/renderer.hpp>
 #include <project/indexbuffer.hpp>
 #include <project/vertexbuffer.hpp>
@@ -5,6 +8,12 @@
 #include <project/shader.hpp>
 #include <project/vertexarray.hpp>
 #include <project/texture.hpp>
+
+
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 
 #include <alloca.h>
 #include <iostream>
@@ -14,7 +23,6 @@
 
 int main(void)
 {
-
     GLFWwindow* window;
 
     /* Initialize the library */
@@ -34,7 +42,7 @@ int main(void)
 
   
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -51,11 +59,11 @@ int main(void)
 {
     float vertices[] {
   //triangle 1 
-      -0.5f, -0.5f, 0.0f, 0.0f,
-       0.5f, -0.5f, 1.0f, 0.0f,
+      100.0f, 100.0f, 0.0f, 0.0f,
+      200.0f, 100.0f, 1.0f, 0.0f,
   //triangle 2
-       0.5f,  0.5f, 1.0f, 1.0f,
-      -0.5f,  0.5f, 0.0f, 1.0f
+      200.0f, 200.0f, 1.0f, 1.0f,
+      100.0f, 200.0f, 0.0f, 1.0f
     };
     unsigned int indices[]{
       0, 1, 2,
@@ -69,14 +77,20 @@ int main(void)
     VertexBufferLayout layout;
     Renderer renderer;
     Texture texture{"./res/textures/flag.png"};
+    glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100,0,0));
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
 
 
-
-
+    glm::mat4 mvp = proj * view * model;
+    GLCall(glEnable(GL_BLEND));
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    
+
     shader.Bind();
     texture.Bind(0);
     shader.SetUniform1i("u_Texture", 0);
+    shader.SetUniformMat4f("u_MVP", mvp);
 
     layout.Push<float>(2);
     layout.Push<float>(2);
