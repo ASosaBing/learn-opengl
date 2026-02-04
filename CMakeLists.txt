@@ -43,7 +43,9 @@ add_executable(opengl src/shader.cpp src/main.cpp src/glad.c src/renderer.cpp
                       src/vertexarray.cpp src/stb_image.cpp src/texture.cpp
                       ./include/imgui/imgui.cpp  ./include/imgui/imgui_demo.cpp  ./include/imgui/imgui_draw.cpp
                       ./include/imgui/imgui_impl_glfw.cpp ./include/imgui/imgui_impl_opengl3.cpp
-                      ./include/imgui/imgui_tables.cpp ./include/imgui/imgui_widgets.cpp)
+                      ./include/imgui/imgui_tables.cpp ./include/imgui/imgui_widgets.cpp
+                      ./src/tests/testclearcolor.cpp)
+
 
 
 set_target_properties(opengl PROPERTIES 
