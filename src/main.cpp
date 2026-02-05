@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <project/test.hpp>
 #include <project/indexbuffer.hpp>
 #include <project/renderer.hpp>
 #include <project/shader.hpp>
@@ -53,8 +54,15 @@ int main(void) {
 
 
   {
+    test::Test* currentTest = nullptr;
+    test::TestMenu* testMenu = new test::TestMenu(currentTest);
+    currentTest = testMenu;
 
-    test::TestClearColor test{};
+    test::TestClearColor test;
+    testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+
+
+
     Renderer renderer;
     
 
@@ -79,10 +87,24 @@ int main(void) {
 
 
       ImGui::NewFrame();
+      if(currentTest){
+        currentTest->OnUpdate(0.0f);
+        currentTest->OnRender();
+        ImGui::Begin("Test");
+        if(currentTest != testMenu && ImGui::Button("<-")){
+          delete currentTest;
+          currentTest = testMenu;
+        }
+
+
+        currentTest->OnImGuiRender();
+        ImGui::End();
 
 
 
-      test.OnImGuiRender();
+      }
+
+
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -91,6 +113,12 @@ int main(void) {
       /* Poll for and process events */
       glfwPollEvents();
     }
+
+    delete currentTest;
+    if(currentTest != testMenu){
+      delete testMenu;
+    }
+
   }
 
   ImGui_ImplOpenGL3_Shutdown();
